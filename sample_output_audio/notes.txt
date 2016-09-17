@@ -1,0 +1,13 @@
+# Get my bash aliases
+. ./.bash_aliases
+
+# Find your stereo monitor's name
+padevices
+
+# Record audio output
+pacat --record -d MONITOR_DEVICE_NAME --file-format=wav > moniter_out_1.wav
+
+# MONITOR_DEVICE_NAME should look something like: alsa_output.pci-0000_00_1b.0.analog-stereo.monitor
+
+# Fill in ./sample.sh with your MONITER_DEVICE_NAME
+
