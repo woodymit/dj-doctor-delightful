@@ -1,12 +1,10 @@
 import curses
-import sys
 import time
 
 import rgb_funcs
 
 import numpy as np
 
-global_i = -1
 COLOR_BLACK = 50
 COLOR_WHITE = 51
 COLOR_ORANGE = 52
@@ -65,7 +63,7 @@ def border_coords(xl, xu):
     # Bottom left to upper left
     l = np.vstack([np.arange(y_u - 1, y_l, -1), np.ones(y_r - 1) * x_l]).T
     # Upper right to bottom right
-    r = np.vstack([np.arange(y_l, y_u - 1), np.ones(y_r - 1) *  (x_u - 1)]).T
+    r = np.vstack([np.arange(y_l, y_u - 1), np.ones(y_r - 1) * (x_u - 1)]).T
 
     # # Debugging
     # for a, label in zip([u, r, b, l], ['u', 'r', 'b', 'l']):
@@ -95,20 +93,18 @@ class LightsArr:
             try:
                 self.scr.addch(int(y), int(x), ord('*'), color)
             except Exception as e:
-                raise Exception('x:{0}; y:{1}'.format(int(x), int(y)))
+                raise Exception('addch error drawing at x:{0}; y:{1}'.format(
+                        int(x), int(y)))
 
 
 def initialize_gradient(start_hex="#0000cc", finish_hex='#FFFFFF',
         n=20, init_idx=100, bg_color=COLOR_BLACK):
-
-    global global_i # Debugging
 
     gradient = rgb_funcs.linear_gradient(start_hex, finish_hex, n)
     gradient = (999. / 255. * arr(gradient)).astype(int)
 
     color_indicies = []
     for i, rgb in enumerate(gradient):
-        global_i = i # Debugging
 
         r, g, b = rgb
         color_idx = init_idx + i
