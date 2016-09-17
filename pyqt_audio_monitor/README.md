@@ -1,3 +1,12 @@
+# SETUP
+
+# Set your PulseAudio default source to be your stereo output monitor
+
+pacmd set-default-source "SOURCENAME" to set the default input
+
+
+
+# INFO
 
 # qt audio monitor
 
