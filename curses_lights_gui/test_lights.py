@@ -2,17 +2,46 @@ import curses
 import time
 
 import rgb_funcs
+import rgb2short
 
 import numpy as np
 
-COLOR_BLACK = 50
-COLOR_WHITE = 51
-COLOR_ORANGE = 52
+COLOR_BLACK = 0
+COLOR_WHITE = 15
+COLOR_ORANGE = 202
+
+# COLOR_BLACK = 50
+# COLOR_WHITE = 51
+# COLOR_ORANGE = 52
 
 ORANGE_RGB = np.array([255, 105, 0])
 
-BG_CP_IDX = 50
-TEXT_CP_IDX = 51
+BG_CP_IDX = COLOR_WHITE
+TEXT_CP_IDX = COLOR_ORANGE
+
+# BG_CP_IDX = 50
+# TEXT_CP_IDX = 51
+
+
+def init_0_pair():
+    # Throws error for whatever reason:
+    curses.init_pair(0, 0, 0)
+    # This does not:
+    curses.init_pair(1, 0, 0)
+
+
+def init_rgb2short():
+    for i, hex_str in rgb2short.SHORT2RGB_DICT.items():
+        i = int(i)
+        rgb = (999. / 255. * rgb_funcs.hex_to_RGB(hex_str)).astype(int)
+        curses.init_color(i, rgb[0], rgb[1], rgb[2])
+        try:
+            if i == 0:
+                continue
+            curses.init_pair(i, i, COLOR_BLACK)
+        except Exception:
+            raise Exception('i:{0}, hex_str:{1}, rgb:{2}\n'.format(
+                    i, hex_str, rgb))
 
 
 def init_default_colors():
@@ -29,7 +58,9 @@ def init_default_color_pairs():
 
 
 def fill_background(stdscr):
-    stdscr.bkgd(ord(' '), curses.color_pair(BG_CP_IDX))
+    # CP_I = BG_CP_IDX
+    CP_I = 87
+    stdscr.bkgd(ord(' '), curses.color_pair(CP_I))
 
 
 def get_keypresses(stdscr):
@@ -129,10 +160,18 @@ def main(stdscr):
     # stdscr.border(0)
 
     # Initialize colors
-    init_default_colors()
-    init_default_color_pairs()
+    init_rgb2short()
+    # init_default_colors()
+    # init_default_color_pairs()
     fill_background(stdscr)
     stdscr.refresh()
+
+    # Test writing background
+    stdscr.addch(10, 10, ord('*'), curses.color_pair(BG_CP_IDX))
+    # Orange on Green
+    MY_CP = 87
+    curses.init_pair(MY_CP, 202, 46)
+    stdscr.addch(11, 11, ord('*'), curses.color_pair(MY_CP))
 
     # Write welcome message
     msg = 'a btb "lights from the comfort of your room" comm.prod'
