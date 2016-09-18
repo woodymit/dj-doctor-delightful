@@ -1,8 +1,12 @@
-def hex_to_RGB(hex):
-    ''' "#FFFFFF" -> [255,255,255] '''
-    # Pass 16 to the integer function for change of base
-    return [int(hex[i:i+2], 16) for i in range(1,6,2)]
+import numpy as np
 
+
+def hex_to_RGB(hex_str):
+    ''' "#FFFFFF" -> [255,255,255] '''
+    hex_str = hex_str.strip('#')
+
+    # Pass 16 to the integer function for change of base
+    return np.array([int(hex_str[i:i + 2], 16) for i in range(0, 6, 2)])
 
 
 def linear_gradient(start_hex, finish_hex="#FFFFFF", n=307):
@@ -18,11 +22,9 @@ def linear_gradient(start_hex, finish_hex="#FFFFFF", n=307):
     # Calcuate a color at each evenly spaced value of t from 1 to n
     for t in range(1, n):
         # Interpolate RGB vector for color at the current value of t
-        curr_vector = [int(s[j] + (float(t)/(n-1))*(f[j]-s[j])) for j in range(3)]
+        curr_vector = [int(s[j] + (float(t) / (n - 1)) * (f[j] - s[j]))
+                for j in range(3)]
         # Add it to our list of output colors
         RGB_list.append(curr_vector)
 
     return RGB_list
-
-start = '#660000'   
-end = '#7f1ae5'.upper()
