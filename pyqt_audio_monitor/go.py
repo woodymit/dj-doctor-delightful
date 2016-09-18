@@ -16,6 +16,16 @@ class ExampleApp(QtGui.QMainWindow, ui_main.Ui_MainWindow):
         self.maxFFT = 0
         self.maxPCM = 0
         self.ear = SWHear.SWHear(device=8)
+        self.maxFFT = 0
+        self.maxPCM = 0
+        # For mac users, you have to determine what your output
+        # audio device is.
+        # To do this, first download and install soundflower
+        # then, go to your system preferences, audio, and then select
+        # soundflower as your output audio.
+        # Finally, run python device_info.py in the terminal,
+        # and determine which index is soundflower (2ch).
+        # From there, set the value of device equal to the index.
         self.ear.stream_start()
 
     def update(self):
