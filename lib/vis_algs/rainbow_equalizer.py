@@ -14,9 +14,14 @@ class Visualizer(object):
         self.nbins = nbins
         self.color = color
         tiny = 1E-4
-        self.maxes = np.zeros(self.nbins) + tiny
+        self.maxes = np.zeros(len(self.freq)) + tiny
 
     def freq_to_hex(self, freq):
+
+        self.maxes = np.max(np.vstack((self.maxes, freq)), axis=0)
+        normed_amplitudes = freq / self.maxes
+        # TODO: Incorporate use of self.maxes instead of MAX_AMPLITUDE
+
         num_buckets = len(freq)
         light_amplitude_values = np.zeros(self.nlights)
         for i in range(num_buckets):

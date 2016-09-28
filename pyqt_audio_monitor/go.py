@@ -44,6 +44,8 @@ class ExampleApp(QtGui.QMainWindow, ui_main.Ui_MainWindow):
             pen = pyqtgraph.mkPen(color='r')
             self.grFFT.plot(self.ear.fftx[:500], self.ear.fft[:500],
                             pen=pen, clear=True)
+            self.setWindowTitle('Max freq:{0}, # samples:{1}'.format(
+                    self.ear.fftx[-1], len(self.ear.fftx)))
         QtCore.QTimer.singleShot(1, self.update)  # QUICKLY repeat
 
 
