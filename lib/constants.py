@@ -3,3 +3,6 @@ MAX_BUCKET = 1000  # hz
 NUM_LIGHTS = 14  # number of lights around the room
 MAX_AMPLITUDE = 1
 BASS_MAX_FREQ = 256
+NSAMPLES = 2048
+MAX_FREQ = 22039
+FREQ_PER_SAMPLE = float(MAX_FREQ) / NSAMPLES

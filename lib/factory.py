@@ -3,7 +3,8 @@ import time
 
 import settings
 
-from PyQt4 import QtGui, QtCore
+import numpy as np
+from PyQt4 import QtGui
 
 
 class ToolStack(object):
@@ -17,17 +18,28 @@ class ToolStack(object):
         # Begin sampling
         self.sampler.stream_start()
         self.hang_till_sampler_starts()
+        self.freq_staleness = 0
+        self.prev_freq = None
 
     def hang_till_sampler_starts(self):
         i = 0
-        while (self.sampler.data is not None or self.sampler.fft is not None):
+        while (self.sampler.data is None or self.sampler.fft is None):
             print('i:{0}'.format(i))
             time.sleep(self.hang_time)
 
     def get_hex_arr(self):
         assert (self.sampler.data is not None and self.sampler.fft is not None)
-        rgb_arr = self.vis_alg.freq_to_hex(self.sampler.fft[:500])
-        return rgb_arr
+        freq = self.sampler.fft[:500]
+
+        if self.prev_freq is not None:
+            is_stale = np.linalg.norm(self.prev_freq - freq)
+            if is_stale:
+                self.freq_staleness += 1
+            else:
+                self.freq_staleness = 0
+
+        hex_arr = self.vis_alg.freq_to_hex(freq)
+        return hex_arr, self.freq_staleness
 
     def close(self):
         self.sampler.close()
@@ -57,7 +69,7 @@ class FullStack(object):
         self.light_sim.get_hex_arr = self.tool_stack.get_hex_arr
 
         self.light_sim.show()
-        self.light_sim.update()  # start with something
+        self.light_sim.update()
 
         app.exec_()
 
