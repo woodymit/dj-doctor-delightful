@@ -1,4 +1,4 @@
-import factory
+import factory_sequential
 from pyqt.light_sim import QTLightSim
 from samplers import SWHear
 from teensy.light_sender import LightSender
@@ -10,7 +10,7 @@ from vis_algs import rainbow_equalizer
 
 
 if __name__ == '__main__':
-    app = factory.FullStack(
+    app = factory_sequential.FullStack(
             SWHear.SWHear,                      # Audio sampler (Threaded)
             smooth_visualizer_abc.Visualizer,   # Visualization Algorithm
             QTLightSim)                         # Light simulator
