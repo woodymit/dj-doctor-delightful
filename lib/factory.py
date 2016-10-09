@@ -2,6 +2,7 @@ import sys
 import time
 
 import settings
+import utils
 
 import numpy as np
 from PyQt4 import QtGui
@@ -10,6 +11,7 @@ from PyQt4 import QtGui
 class ToolStack(object):
 
     hang_time = 1
+    freq_staleness_buffer_len = 20
 
     def __init__(self, sampler, vis_alg):
         self.sampler = sampler
@@ -20,6 +22,8 @@ class ToolStack(object):
         self.hang_till_sampler_starts()
         self.freq_staleness = 0
         self.prev_freq = None
+        self.freq_staleness_buffer = utils.CircularBuffer(
+                self.freq_staleness_buffer_len, np.uint16)
 
     def hang_till_sampler_starts(self):
         i = 0
@@ -32,14 +36,17 @@ class ToolStack(object):
         freq = self.sampler.fft[:500]
 
         if self.prev_freq is not None:
-            is_stale = np.linalg.norm(self.prev_freq - freq)
+            is_stale = np.array_equal(freq, self.prev_freq)
             if is_stale:
                 self.freq_staleness += 1
             else:
+                self.freq_staleness_buffer.write(self.freq_staleness)
                 self.freq_staleness = 0
+        self.prev_freq = freq
 
         hex_arr = self.vis_alg.freq_to_hex(freq)
-        return hex_arr, self.freq_staleness
+        return hex_arr, np.mean(self.freq_staleness_buffer.tape)
+
 
     def close(self):
         self.sampler.close()

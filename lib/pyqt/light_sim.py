@@ -1,37 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import time
+
+import settings
 import utils
 
 import sys
 import numpy as np
 from PyQt4 import QtGui, QtCore
-
-
-class CircularBuffer(object):
-    def __init__(self, n, dtype):
-        self.n = n
-        self.i = 0
-        self.tape = np.zeros(self.n, dtype=dtype)
-
-    def write(self, data):
-        self.tape[self.i] = data
-        self.update_i()
-
-    def update_i(self):
-        self.i = self.next_i()
-
-    def next_i(self):
-        return 0 if self.i == self.n - 1 else self.i + 1
-
-    def prev_i(self):
-        return self.n - 1 if self.i == 0 else self.i - 1
-
-    def oldest(self):
-        return self.tape[self.next_i()]
-
-    def newest(self):
-        return self.tape[self.prev_i()]
 
 
 class QTLightSim(QtGui.QWidget):
@@ -44,7 +20,7 @@ class QTLightSim(QtGui.QWidget):
         self.length = length
         self.stride = stride
         self.size = size
-        self.times = CircularBuffer(self.fps_sample_window, float)
+        self.times = utils.CircularBuffer(self.fps_sample_window, float)
         self.fps = 0
 
         super(QTLightSim, self).__init__()
@@ -80,15 +56,19 @@ class QTLightSim(QtGui.QWidget):
         hex_colors, freq_staleness = self.get_hex_arr()
         self.drawBG()
         self.drawRects(hex_colors)
-        if self.iter % 100 == 0:
-            self.recordFPS()
-        self.drawFPS(event)
 
-        if freq_staleness:
-            stale_msg = 'freq staleness:{0}'.format(freq_staleness)
-        else:
-            stale_msg = '0 freq latency'
-        self.drawText(event, stale_msg, 60, 80)
+        if settings.FPS_MONITOR:
+            # Update self.FPS
+            if self.iter % 100 == 0:
+                self.recordFPS()
+
+            # Display FPS
+            fps_msg = 'FPS:{:28.0f}'.format(self.fps)
+            self.drawText(event, fps_msg, 60, 80)
+
+            # Display mean fft staleness
+            stale_msg = 'mean fft staleness: {:5.0f}'.format(freq_staleness)
+            self.drawText(event, stale_msg, 60, 105)
 
         self.qp.end()
 
