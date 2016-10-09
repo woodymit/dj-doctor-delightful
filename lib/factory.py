@@ -75,7 +75,6 @@ class FullStack(object):
 
         self.light_sim.get_hex_arr = self.tool_stack.get_hex_arr
 
-        self.light_sim.show()
         self.light_sim.update()
 
         app.exec_()
