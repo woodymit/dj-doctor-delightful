@@ -7,8 +7,11 @@ check my githib for a more complete version:
 
 import pyaudio
 import time
+import pylab
 import numpy as np
 import threading
+import scipy
+import scipy.fftpack
 
 
 def getFFT(data, rate):
@@ -84,7 +87,6 @@ class SWHear(object):
         if not self.valid_test(self.device, self.rate):
             print("guessing a valid microphone device/rate...")
             self.device = self.valid_input_devices()[0]  # pick the first one
-            print('Trying device: {0}'.format(self.device))
             self.rate = self.valid_low_rate(self.device)
         self.datax = np.arange(self.chunk) / float(self.rate)
         msg = 'recording from "%s" ' % self.info["name"]
@@ -102,11 +104,6 @@ class SWHear(object):
         self.p.terminate()
 
     # STREAM HANDLING
-
-    def stream_readchunk_sequential(self):
-        self.data = np.fromstring(
-                self.stream.read(self.chunk), dtype=np.int16)
-        self.fftx, self.fft = getFFT(self.data, self.rate)
 
     def stream_readchunk(self):
         """reads some audio and re-launches itself"""
@@ -140,7 +137,7 @@ class SWHear(object):
         self.dataFiltered = None  # same
         self.stream = self.p.open(format=pyaudio.paInt16, channels=1,
                 rate=self.rate, input=True, frames_per_buffer=self.chunk)
-        self.stream_readchunk_sequential()
+        self.stream_thread_new()
 
 
 if __name__ == "__main__":
