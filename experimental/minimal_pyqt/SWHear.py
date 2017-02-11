@@ -7,11 +7,11 @@ check my githib for a more complete version:
 
 import pyaudio
 import time
-import pylab
+#import pylab
 import numpy as np
 import threading
-import scipy
-import scipy.fftpack
+#import scipy
+#import scipy.fftpack
 
 
 def getFFT(data, rate):

@@ -30,7 +30,10 @@ def gaussian_smooth(series, lim, n, sig):
     for light_i, fft_i in enumerate(np.linspace(lim[0], lim[1] - 1, n)):
         xmin = fft_i + lpad - max_d
         xmax = fft_i + lpad + max_d + 1
-        conv = gauss_arr.dot(myseries[xmin:xmax])
+        
+        print('xmin:', xmin, '\txmax:', xmax)
+        
+        conv = gauss_arr.dot(myseries[int(xmin):int(xmax)])
         out[light_i] = conv
 
     assert np.amin(out) >= 0
