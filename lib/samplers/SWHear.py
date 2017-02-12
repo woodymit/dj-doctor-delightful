@@ -32,10 +32,12 @@ class SWHear(object):
     def __init__(self, device=None, rate=None):
         """fire up the SWHear class."""
         self.p = pyaudio.PyAudio()
-        # self.chunk = 4096  # number of data points to read at a time
-        self.chunk = 1024  # number of data points to read at a time
+        self.chunk = 4096  # number of data points to read at a time
         self.device = device
         self.rate = rate
+
+    def max_fps(self):
+        return self.rate / self.chunk
 
     # SYSTEM TESTS
 
@@ -163,13 +165,18 @@ class SWHear(object):
     def stream_start(self):
         """adds data to self.data until termination signal"""
         self.initiate()
+
+        print('Max FPS: {0}  at [sample rate:{1}Hz   chunk size:{2}]'.format(
+                self.max_fps(), self.rate, self.chunk))
+
         print(" -- starting stream")
         self.keepRecording = True  # set to False later to terminate stream
         self.data = None  # will fill up with threaded recording data
         self.fft = None
         self.dataFiltered = None  # same
         self.stream = self.p.open(format=pyaudio.paInt16, channels=1,
-                rate=self.rate, input=True, frames_per_buffer=self.chunk)
+                rate=self.rate, input=True, frames_per_buffer=self.chunk,
+                input_device_index=self.device)
         self.stream_readchunk_sequential()
 
 
