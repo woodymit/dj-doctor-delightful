@@ -7,6 +7,9 @@ import utils
 import numpy as np
 from PyQt4 import QtGui
 
+CHECK_STALE_FFT = True
+ASSERT_NOT_STALE_FFT = True
+
 
 class ToolStack(object):
 
@@ -35,17 +38,21 @@ class ToolStack(object):
 
         self.sampler.stream_readchunk_sequential()
 
-        assert (self.sampler.data is not None and self.sampler.fft is not None)
-        freq = self.sampler.fft[:500]
+        # Check if the sampler's fft is the same as in the last call to get_hex_arr
+        if CHECK_STALE_FFT:
+            assert (self.sampler.data is not None and self.sampler.fft is not None)
+            freq = self.sampler.fft[:500]
 
-        if self.prev_freq is not None:
-            is_stale = np.array_equal(freq, self.prev_freq)
-            if is_stale:
-                self.freq_staleness += 1
-            else:
-                self.freq_staleness_buffer.write(self.freq_staleness)
-                self.freq_staleness = 0
-        self.prev_freq = freq
+            if self.prev_freq is not None:
+                is_stale = np.array_equal(freq, self.prev_freq)
+                if is_stale:
+                    if ASSERT_NOT_STALE_FFT:
+                        assert False
+                    self.freq_staleness += 1
+                else:
+                    self.freq_staleness_buffer.write(self.freq_staleness)
+                    self.freq_staleness = 0
+            self.prev_freq = freq
 
         hex_arr = self.vis_alg.freq_to_hex(freq)
         return hex_arr, np.mean(self.freq_staleness_buffer.tape)
@@ -66,12 +73,11 @@ class FullStack(object):
 
     def start(self):
 
-        app = QtGui.QApplication(sys.argv)
-
         self.light_sim = self.light_sim_class()
 
-        rate = 44100 * 2
-        self.sampler = self.sampler_class(settings.STEREO_MONITOR_SOURCE, rate)
+        pa_device_index = None
+        sample_rate = 44100
+        self.sampler = self.sampler_class(pa_device_index, sample_rate)
         self.vis_alg = self.vis_alg_class(self.light_sim.nlights)
         self.tool_stack = ToolStack(
                 self.sampler,
@@ -79,9 +85,7 @@ class FullStack(object):
 
         self.light_sim.get_hex_arr = self.tool_stack.get_hex_arr
 
-        self.light_sim.update()
-
-        app.exec_()
+        self.light_sim.start()
 
     def close(self):
         self.tool_stack.close()

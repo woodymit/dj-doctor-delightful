@@ -16,6 +16,8 @@ class QTLightSim(QtGui.QWidget):
 
     def __init__(self, height=19, length=31, stride=32, size=30):
 
+        self.app = QtGui.QApplication(sys.argv)
+
         self.height = height
         self.length = length
         self.stride = stride
@@ -73,8 +75,11 @@ class QTLightSim(QtGui.QWidget):
         self.qp.end()
 
     def calcFPS(self):
-        fps = (self.fps_sample_window - 1) / (
-                self.times.newest() - self.times.oldest())
+        if (self.times.newest() == self.times.oldest()):
+            fps = -1
+        else:
+            fps = (self.fps_sample_window - 1) / (
+                    self.times.newest() - self.times.oldest())
         assert max(self.times.tape) == self.times.newest()
         return fps
 
@@ -108,10 +113,7 @@ class QTLightSim(QtGui.QWidget):
                     loc[0] * self.stride + 10, self.size, self.size)
 
     def update(self):
-        if self.get_hex_arr is None:
-            raise Exception('Pls assign me a get_hex_arr func')
 
-        # t = time.clock()
         t = time.time()
         self.times.write(t)
 
@@ -128,6 +130,13 @@ class QTLightSim(QtGui.QWidget):
             if ((i + j) % 2 == 1):
                 colors[i] = "#00FF00"
         return colors
+
+    def start(self):
+        if self.get_hex_arr is None:
+            raise Exception('Pls assign me a get_hex_arr func')
+
+        self.update()
+        self.app.exec_()
 
 
 def main():
