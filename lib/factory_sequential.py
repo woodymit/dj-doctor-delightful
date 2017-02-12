@@ -8,7 +8,7 @@ import numpy as np
 from PyQt4 import QtGui
 
 CHECK_STALE_FFT = True
-ASSERT_NOT_STALE_FFT = True
+ASSERT_NOT_STALE_FFT = False
 
 
 class ToolStack(object):
@@ -76,7 +76,7 @@ class FullStack(object):
         self.light_sim = self.light_sim_class()
 
         pa_device_index = None
-        sample_rate = 44100
+        sample_rate = 44100 * 2
         self.sampler = self.sampler_class(pa_device_index, sample_rate)
         self.vis_alg = self.vis_alg_class(self.light_sim.nlights)
         self.tool_stack = ToolStack(
