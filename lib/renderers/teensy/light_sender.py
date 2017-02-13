@@ -1,17 +1,17 @@
 import serial
-import teensy.serial_constants
+from renderers.teensy import serial_constants
 import utils
 
 
 class LightSender(object):
 
     def __init__(self,
-            serial_port=teensy.serial_constants.SERIAL_ADDR,
-            nlights=teensy.serial_constants.TOTAL_LEDS):
+            serial_port=serial_constants.SERIAL_ADDR,
+            nlights=serial_constants.TOTAL_LEDS):
 
         self.nlights = nlights
         self.serial = serial.Serial(
-                serial_port, teensy.serial_constants.BAUD, timeout=1)
+                serial_port, serial_constants.BAUD, timeout=1)
         self.data = bytearray([0] * (self.nlights * 3))
 
     def strobe(self):

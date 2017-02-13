@@ -13,11 +13,10 @@ class Visualizer(vis_alg_base.VisualizationAlgorithm):
 
         self.log_time()
 
-        freq_range = [0, 500]
         sigma = 8
 
         amplitudes_gauss = smoothing_utils.gaussian_smooth(
-                freq, freq_range, self.nlights, sigma)
+                freq, self.nlights, sigma)
 
         assert len(amplitudes_gauss) == self.nlights
         assert all(not np.isnan(a) for a in amplitudes_gauss)

@@ -1,18 +1,15 @@
-import factory_sequential
-from pyqt.light_sim import QTLightSim
-from samplers import SWHear
-from teensy.light_sender import LightSender
-from vis_algs import bass_flash
-from vis_algs import bin_fft
-from vis_algs import bin_fft_v2
-from vis_algs import smooth_visualizer_abc
-from vis_algs import rainbow_equalizer
+from factory_sequential import ToolStack
+from renderers.pyqt.light_sim import QTLightSim
+from renderers.teensy.light_sender import LightSender
+from samplers.pyaudio_sampler import PyAudioSampler
+from spectrum_analyzers.spectrum_analyzers import WindowedSTFT
+from vis_algs.smooth_visualizer import Visualizer
 
 
 if __name__ == '__main__':
-    app = factory_sequential.FullStack(
-            SWHear.SWHear,                      # Audio sampler (Threaded)
-            smooth_visualizer_abc.Visualizer,   # Visualization Algorithm
-            QTLightSim)                         # Light simulator
-            # LightSender)                      # Light serial sender
+    app = ToolStack(
+            PyAudioSampler,                     # Audio sampler
+            WindowedSTFT,						# Spectrum analyzer
+            Visualizer,   						# Visualization algorithm
+            QTLightSim)                         # Light simulator / Light serial sender
     app.start()
