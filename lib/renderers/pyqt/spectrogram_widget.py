@@ -5,7 +5,7 @@ from PyQt4 import QtCore, QtGui
 
 
 class SpectrogramWidget(pg.PlotWidget):
-    read_collected = QtCore.pyqtSignal(np.ndarray)
+
     def __init__(self, spectrum_analyzer):
         super(SpectrogramWidget, self).__init__()
 
@@ -31,33 +31,27 @@ class SpectrogramWidget(pg.PlotWidget):
         self.img.setLevels([-50,40])
 
         # setup the correct scaling for y-axis
-        freq = spectrum_analyzer.get_freq()
-        yscale = 1.0/(self.img_array.shape[1]/freq[-1])
+        freqs = spectrum_analyzer.get_freqs()
+        yscale = 1.0/(self.img_array.shape[1]/freqs[-1])
         self.img.scale((1./sample_rate)*nsamples, yscale)
 
         self.setLabel('left', 'Frequency', units='Hz')
 
         self.show()
 
-    def update(self, spectrum):
+    def update(self):
+
+        spectrum = self.get_spectrum()
+
+        p10 = np.percentile(spectrum, 10)
+        p90 = np.percentile(spectrum, 90)
+
+        print('p10:', p10, '\tp90:', p90)
+
         # roll down one and replace leading edge with new data
         self.img_array = np.roll(self.img_array, -1, 0)
         self.img_array[-1:] = spectrum
 
         self.img.setImage(self.img_array, autoLevels=False)
 
-if __name__ == '__main__':
-    app = QtGui.QApplication([])
-    w = SpectrogramWidget()
-    w.read_collected.connect(w.update)
-
-    mic = MicrophoneRecorder(w.read_collected)
-
-    # time (seconds) between reads
-    interval = sample_rate/nsamples
-    t = QtCore.QTimer()
-    t.timeout.connect(mic.read)
-    t.start(1000/interval) #QTimer takes ms
-
-    app.exec_()
-    mic.close()
+        QtCore.QTimer.singleShot(1, self.update)  # QUICKLY repeat

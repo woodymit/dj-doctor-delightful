@@ -20,7 +20,7 @@ class WindowedSTFT(SpectrumAnalyzerABC):
         psd = abs(spec)
 
         # convert to dB scale
-        # psd = 20 * np.log10(psd)
+        psd = 20 * np.log10(psd)
 
         return psd
 
