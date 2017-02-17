@@ -10,13 +10,15 @@ if __name__ == '__main__':
     # Sampler params
     pa_device_index = None
     sample_rate = 44100 * 2
+    nsamples = 4096 * 2
+    max_freq = 2000
 
     # Instantiate sampler and spectrum analyzer
-    sampler = PyAudioSampler(pa_device_index, sample_rate)
+    sampler = PyAudioSampler(pa_device_index, sample_rate, nsamples)
     spectrum_analyzer = WindowedSTFT(sampler.nsamples, sampler.rate)
 
     app = QtGui.QApplication([])
-    spectrogram_widget = SpectrogramWidget(spectrum_analyzer)
+    spectrogram_widget = SpectrogramWidget(spectrum_analyzer, max_freq)
 
     # Add spectrum getter function to the widget
     def get_spectrum():
