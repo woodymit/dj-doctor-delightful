@@ -10,7 +10,7 @@ class WindowedSTFT(SpectrumAnalyzerABC):
         self.nsamples = nsamples
         self.win = np.hanning(self.nsamples)
         self.sample_rate = sample_rate
-        self.freqs = np.arange((int(nsamples / 2) + 1) / (nsamples / sample_rate))
+        self.freqs = np.arange((nsamples / 2) + 1, dtype=np.int32) / (nsamples / sample_rate)
     
     def get_spectrum(self, x):
         # normalized, windowed frequencies in data chunk
@@ -25,4 +25,4 @@ class WindowedSTFT(SpectrumAnalyzerABC):
         return psd
 
     def get_freqs(self):
-        return self.freqs
+        return self.freqs.copy()
