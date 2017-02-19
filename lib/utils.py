@@ -35,6 +35,36 @@ class CircularBuffer(object):
         return self.tape[self.prev_i()]
 
 
+class CircularChunkBuffer(object):
+    def __init__(self, n, chunk, dtype=float):
+        self.n = n
+        self.chunk = chunk
+        self.i = 0
+        self.tape = np.zeros(self.n * self.chunk, dtype=dtype)
+
+    def write(self, data):
+        self.tape[self.i * self.chunk:(self.i+1) * self.chunk] = data
+        self.update_i()
+
+    def update_i(self):
+        self.i = self.next_i()
+
+    def next_i(self):
+        return 0 if self.i == self.n - 1 else self.i + 1
+
+    def prev_i(self):
+        return self.n - 1 if self.i == 0 else self.i - 1
+
+    def oldest(self):
+        return self.tape[self.next_i()]
+
+    def newest(self):
+        return self.tape[self.prev_i()]
+
+    def unwind(self):
+        return np.roll(self.tape, -self.i * self.chunk)
+
+
 # rgb_val is between 0 and 255
 def val_to_hex_str(rgb_val):
 
