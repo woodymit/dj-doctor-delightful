@@ -10,15 +10,16 @@ MONITOR_PATTERN = 'monitor'
 
 class PyAudioSamplerAsync(SamplerABC):
 
-    def __init__(self, device=None, rate=44100, nsamples=4096, nchunks=5):
+    def __init__(self, device=None, rate=44100, nsamples=4096, nchunks=5, signal=None):
         self.buffer = CircularChunkBuffer(nchunks, nsamples, np.int16)
         self.device = device
         self.nsamples = nsamples  # number of data points to read at a time
         self.rate = rate
+        self.signal = signal
 
         self.p = pyaudio.PyAudio()
         self.initiate()
-        self.start()
+        # self.start()
 
     def max_fps(self):
         return self.rate / self.nsamples
@@ -130,6 +131,7 @@ class PyAudioSamplerAsync(SamplerABC):
     def stream_callback(self, in_data, frame_count, time_info, status_flags):
 
         self.buffer.write(np.fromstring(in_data, 'int16'))
+        self.signal.emit(self.read())
         return (None, pyaudio.paContinue)
 
     def start(self):
