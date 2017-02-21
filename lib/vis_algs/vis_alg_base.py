@@ -3,21 +3,20 @@ import time
 
 import numpy as np
 
+class VisualizationAlgorithmABC(object, metaclass=abc.ABCMeta):
 
-class VisualizationAlgorithm(object):
+    @abc.abstractmethod
+    def freq_to_hex(self, freq):
+        pass
 
-    __metaclass__ = abc.ABCMeta
+
+class VisualizationAlgorithm(VisualizationAlgorithmABC):
 
     def __init__(self, nlights):
         self.nlights = nlights
         self.lights = np.zeros((self.nlights, 3))
         self.maxes = None
         self.times = []
-
-
-    @abc.abstractmethod
-    def freq_to_hex(self, freq):
-        pass
 
     def norm_amplitudes(self, a):
 
@@ -31,6 +30,3 @@ class VisualizationAlgorithm(object):
     def log_time(self):
         t = time.clock()
         self.times.append(t)
-
-    # def set_params(self, params):
-    # 	self.params = params

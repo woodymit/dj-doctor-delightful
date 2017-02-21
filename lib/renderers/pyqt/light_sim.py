@@ -55,7 +55,7 @@ class QTLightSim(QtGui.QWidget):
 
     def paintEvent(self, event):
         self.qp.begin(self)
-        hex_colors, freq_staleness = self.get_hex_arr()
+        hex_colors = self.get_hex_arr()
         self.drawBG()
         self.drawRects(hex_colors)
 
@@ -67,10 +67,6 @@ class QTLightSim(QtGui.QWidget):
             # Display FPS
             fps_msg = 'FPS:{:28.0f}'.format(self.fps)
             self.drawText(event, fps_msg, 60, 80)
-
-            # Display mean fft staleness
-            stale_msg = 'mean fft staleness: {:5.0f}'.format(freq_staleness)
-            self.drawText(event, stale_msg, 60, 105)
 
         self.qp.end()
 
@@ -106,6 +102,7 @@ class QTLightSim(QtGui.QWidget):
         self.qp.drawRect(0, 0, 2000, 2000)
 
     def drawRects(self, hex_colors):
+        assert len(hex_colors) == len(self.locations)
         for hex_color, loc in zip(hex_colors, self.locations):
             rgbtuple = utils.hex_to_rgb(hex_color)
             self.qp.setBrush(QtGui.QColor(*rgbtuple))
@@ -137,6 +134,9 @@ class QTLightSim(QtGui.QWidget):
 
         self.update()
         self.app.exec_()
+
+    def close(self):
+        self.app.quit()
 
 
 def main():

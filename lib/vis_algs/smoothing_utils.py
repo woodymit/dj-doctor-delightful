@@ -8,7 +8,9 @@ def get_gaussian(mu, sig):
     return P
 
 
-def gaussian_smooth(series, lim, n, sig):
+def gaussian_smooth(series, n, sig):
+
+    lim = [0, len(series)]
 
     max_d = int(3 * sig)
     gauss = get_gaussian(0, sig)
