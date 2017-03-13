@@ -1,3 +1,4 @@
+import time
 import utils
 
 import numpy as np
@@ -11,8 +12,10 @@ class SpectrogramWidget(pg.PlotWidget):
 
     read_collected = QtCore.pyqtSignal(np.ndarray)
 
-    def __init__(self, shape):
+    def __init__(self, shape, autolevel_period=4):
         super(SpectrogramWidget, self).__init__()
+
+        self.autolevel_period = autolevel_period
 
         self.crop_index = None
 
@@ -33,29 +36,33 @@ class SpectrogramWidget(pg.PlotWidget):
         self.img.setLevels([5000,500000])
 
         self.slider = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.last_autolevel = 0
 
         self.show()
 
     def auto_set_levels(self, spectrum):
         p05 = np.percentile(spectrum, 5)
         p95 = np.percentile(spectrum, 95)
-        # self.img.setLevels([p05, p95])
+        self.img.setLevels([p05, p95])
 
         print('min:', spectrum.min(),'\tp05:', p05, '\tp95:', p95, '\tmax:', spectrum.max())
 
+    def periodic_set_levels(self):
+        t = time.time()
+        time_since_autolevel =  t - self.last_autolevel
+        if time_since_autolevel > self.autolevel_period:
+            self.last_autolevel = t
+            self.auto_set_levels(self.img_array)
 
     def update(self, chunk):
 
         spectrum = self.get_spectrum(chunk)[:self.crop_index]
-        self.auto_set_levels(spectrum)
-
-        # p10 = np.percentile(spectrum, 10)
-        # p90 = np.percentile(spectrum, 90)
-
-        # print('p10:', p10, '\tp90:', p90, '\t\tmin:', spectrum.min(), '\tmax:', spectrum.max())
 
         # Roll down one and replace leading edge with new data
         self.img_array = np.roll(self.img_array, -1, 0)
         self.img_array[-1:] = spectrum
 
         self.img.setImage(self.img_array, autoLevels=False)
+        self.periodic_set_levels()
+
+
