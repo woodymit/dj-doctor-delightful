@@ -28,7 +28,6 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication([])
     spectrogram_widget = SpectrogramWidget((n_frames, n_bins))
-    spectrogram_widget.read_collected.connect(spectrogram_widget.update)
 
     sampler.signal = spectrogram_widget.read_collected
 

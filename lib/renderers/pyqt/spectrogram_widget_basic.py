@@ -38,6 +38,8 @@ class SpectrogramWidget(pg.PlotWidget):
         self.slider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.last_autolevel = 0
 
+        self.read_collected.connect(self.update)
+
         self.show()
 
     def auto_set_levels(self, spectrum):
