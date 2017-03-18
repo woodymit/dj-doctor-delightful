@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utils import read_wave
-from realtime_cqt import CQT
-from realtime_cqt import atom
+from spectrum_analyzers.realtime_cqt import CQT
+from spectrum_analyzers.realtime_cqt import atom
 
 wave_path = '../test_files/mary_had_a_little_lamb.wav'
 
@@ -104,9 +104,9 @@ def example_plot_cqt(log_scale=False):
     nseconds = 24
     s, sample_rate = read_wave(wave_path, nseconds)
 
-    cqt_freq = 14  # Hz
+    cqt_freq = 25  # Hz
     n_octaves = 7
-    bins_per_octave = 48
+    bins_per_octave = 96
     transform = take_cqt(s, sample_rate, cqt_freq, 
             n_octaves=n_octaves, bins_per_octave=bins_per_octave, zero_pad=True)
     n_cqts = transform.shape[0]
@@ -121,7 +121,7 @@ def example_plot_cqt(log_scale=False):
     top_percentile = 100
     vmin = np.percentile(transform, bottom_percentile)
     vmax = np.percentile(transform, top_percentile)
-    plot_spectrogram(transform.T, vmin=vmin, vmax=vmax)
+    plot_spectrogram(transform.T, vmin=vmin, vmax=vmax, cmap='inferno')
 
     print(
         'min:', transform.min(),
