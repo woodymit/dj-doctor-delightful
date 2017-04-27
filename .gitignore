@@ -1,4 +1,4 @@
 __pycache__/
 *.pyc
 lib/settings.py
-
+synaptic_controls/vids/*
